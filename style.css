@@ -1,0 +1,267 @@
+    @import url('https://fonts.googleapis.com/css2?family=Great+Vibes&display=swap');
+
+    body {
+        font-family: 'Great Vibes', cursive;
+    }
+
+    :root {
+        --overlay: rgba(0, 0, 0, 0.45);
+        --card-bg: rgba(255, 255, 255, 0.95);
+        --accent: #222;
+        --radius: 12px;
+        --maxw: 820px;
+    }
+
+    html,
+    body {
+        height: 100%;
+        margin: 0;
+        font-family: Inter, "Segoe UI", Roboto, Arial, sans-serif;
+        -webkit-font-smoothing: antialiased;
+    }
+
+    /* фон */
+    .hero {
+        position: relative;
+        min-height: 100vh;
+        background-image: url('images/bg.jpg');
+        background-size: contain;
+        background-repeat: no-repeat;
+        background-position: center center;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 40px;
+    }
+
+    /* карточка */
+    .card {
+        position: relative;
+        z-index: 2;
+        width: 100%;
+        max-width: 450px;
+        background: none;
+        border-radius: var(--radius);
+        box-shadow: 0 12px 40px rgba(0, 0, 0, 0.35);
+        overflow: hidden;
+        padding: 12px;
+        display: flex;
+        gap: 24px;
+        flex-direction: column;
+        align-items: center;
+        backdrop-filter: blur(4px);
+    }
+
+    .invitation {
+        text-align: center;
+        font-family: 'Great Vibes';
+        font-size: 32px;
+    }
+
+    .invitation h1 {
+        margin: 0 0 8px 0;
+        font-size: 48px;
+        letter-spacing: 0.6px;
+        color: #222;
+    }
+
+    .invitation p.lead {
+        margin: 0;
+        color: #ffffff;
+        opacity: 0.9;
+    }
+
+    .locations {
+        padding: 10px 12px;
+        text-align: center;
+        font-family: 'Ink Free';
+        font-size: 32px;
+    }
+
+    .locations h1 {
+        font-size: 38px;
+        font-family: 'Great Vibes';
+        margin: 0 0 8px 0;
+        letter-spacing: 0.6px;
+        color: #222;
+    }
+
+    .locations p.lead {
+        margin: 0;
+        color: #ffffff;
+        opacity: 0.9;
+        font-weight: 600;
+    }
+
+    .locations p.loc {
+        text-align: left;
+        margin: 0;
+        color: #222;
+        opacity: 0.9;
+        font-size: 20px;
+        font-weight: 600;
+    }
+
+    form.rsvp {
+        display: flex;
+        flex-direction: column;
+        font-family: 'Ink Free';
+        gap: 14px;
+        margin-top: 14px;
+    }
+
+    label.field {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        font-size: 16px;
+        color: #ffffff;
+    }
+
+    input[type="text"] {
+        padding: 10px 12px;
+        border-radius: 8px;
+        border: 1px solid #ddd;
+        font-size: 15px;
+    }
+
+    .question {
+        text-align: center;
+        font-family: 'Great Vibes';
+        font-weight: 600;
+        font-size: 32px;
+        color: #222;
+    }
+
+    /* варианты Да/Нет — стилизованные радиокнопки */
+    .choices {
+        font-weight: 600;
+        display: flex;
+        gap: 12px;
+    }
+
+    .choice {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 10px 14px;
+        border-radius: 10px;
+        border: 1px solid #e5e5e5;
+        background: #fff;
+        cursor: pointer;
+        user-select: none;
+        transition: all .14s ease;
+    }
+
+    .choice input {
+        display: none;
+    }
+
+    .choice .box {
+        width: 20px;
+        height: 20px;
+        border-radius: 4px;
+        border: 1px solid #cfcfcf;
+        display: inline-block;
+        position: relative;
+        flex: 0 0 20px;
+    }
+
+    .choice.checked {
+        border-color: var(--accent);
+        box-shadow: 0 6px 18px rgba(184, 92, 122, 0.12);
+    }
+
+    .choice.checked .box {
+        background: linear-gradient(180deg, #fff, #fff);
+        border-color: var(--accent);
+    }
+
+    .choice.checked .box::after {
+        content: "✓";
+        position: absolute;
+        inset: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--accent);
+        font-weight: 700;
+    }
+
+    .note {
+        font-size: 16px;
+        color: #ffffff;
+    }
+
+    .event-info {
+        display: flex;
+        justify-content: space-around;
+        align-items: center;
+        margin: 30px 0;
+        /* отступ сверху и снизу */
+        flex-wrap: wrap;
+        /* адаптивно на маленьких экранах */
+        gap: 40px;
+    }
+
+    .event-column {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        color: #ffffff;
+        font-weight: 600;
+        font-size: 16px;
+        font-family: 'Ink Free';
+    }
+
+    .event-column h1 {
+        margin: 0 0 8px 0;
+        font-family: 'Great Vibes';
+        font-size: 38px;
+        letter-spacing: 0.6px;
+        color: #222;
+    }
+
+    .event-icon {
+        width: 80px;
+        /* размер иконки */
+        height: 80px;
+        margin-bottom: 8px;
+    }
+
+    .actions {
+        align-self: center;
+        display: flex;
+        gap: 12px;
+        align-items: center;
+        margin-top: 6px;
+    }
+
+    button.submit {
+        font-family: 'Ink Free';
+        background: var(--accent);
+        color: white;
+        padding: 10px 16px;
+        border-radius: 10px;
+        border: 0;
+        cursor: pointer;
+        font-weight: 600;
+        box-shadow: 0 8px 20px rgba(184, 92, 122, 0.16);
+    }
+
+    .status {
+        font-size: 14px;
+        color: #1a7a1a;
+        min-height: 20px;
+    }
+
+    @media (max-width:680px) {
+        .card {
+            padding: 20px;
+        }
+
+        .invitation h1 {
+            font-size: 22px;
+        }
+    }

@@ -1,0 +1,216 @@
+<!doctype html>
+<html lang="ru">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <link rel="stylesheet" href="style.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Great+Vibes&display=swap');
+    </style>
+    <title>Приглашение на свадьбу</title>
+</head>
+
+<body>
+    <section class="hero">
+        <div class="card" role="region" aria-label="Приглашение на свадьбу">
+            <div class="invitation">
+                <h1>Дорогие гости!</h1>
+                <p class="lead">Мы рады сообщить Вам, что</p>
+                <h1>15.10.2025</h1>
+                <p class="lead">состоится долгожданное событие<br> - наша свадьба!</p>
+                <p class="lead">И мы будем невероятно счастливы,<br> если эту радость<br> вы разделите с нами!</p>
+            </div>
+
+            <div class="event-info">
+                <div class="event-column">
+                    <img src="images/rings.png" alt="ЗАГС" class="event-icon">
+                    <span>ЗАГС</span>
+                    <h1>10:30</h1>
+                </div>
+                <div class="event-column">
+                    <img src="images/church.png" alt="Венчание" class="event-icon">
+                    <span>Венчание</span>
+                    <h1>13:00</h1>
+                </div>
+                <div class="event-column">
+                    <img src="images/glasses.png" alt="Начало торжества" class="event-icon">
+                    <span>Начало <br>торжества</span>
+                    <h1>16:00</h1>
+                </div>
+            </div>
+
+            <div class="locations">
+                <h1>Адреса:</h1>
+                <p class="lead">ЗАГС</p>
+                <p class="loc">Москва, Малый Харитоньевский переулок 10,<br> стр. 1, "Дворец Бракосочетания 1"</p>
+                <p class="lead">Церковь</p>
+                <p class="loc">Москва, Олимпийский проспект 9</p>
+                <p class="lead">Ресторан</p>
+                <p class="loc">Московская область, городской округ Красногорск, деревня Путилково 11, стр. 17</p>
+            </div>
+
+            <form class="rsvp" id="rsvpForm" onsubmit="return handleSubmit(event)" autocomplete="off">
+                <label class="field">
+                    <span class="question">Подтвердите свое присутствие</span>
+                </label>
+
+                <label class="field">
+                    <span>Имя и фамилия (если вы не один, введите все имена)</span>
+                    <input id="fullname" name="fullname" type="text" placeholder="Иван Иванов" required />
+                </label>
+
+                <div>
+                    <span class="note">Выберите вариант:</span>
+                    <div class="choices" role="radiogroup" aria-labelledby="rsvpChoice">
+                        <label class="choice" id="choiceYes" tabindex="0">
+                            <div class="box"></div>
+                            <input type="radio" name="attend" value="Да" id="attend_yes" />
+                            <span>Да, приду</span>
+                        </label>
+
+                        <label class="choice" id="choiceNo" tabindex="0">
+                            <div class="box"></div>
+                            <input type="radio" name="attend" value="Нет" id="attend_no" />
+                            <span>Нет, не смогу</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="actions">
+                    <button class="submit" type="submit">Подтвердить</button>
+                    <div class="status" id="status"></div>
+                </div>
+            </form>
+        </div>
+    </section>
+
+    <script>
+        // --- Настройки: замените на ваши данные ---
+        // Вариант A (НЕБЕЗОПАСНЫЙ, демонстрационный): прямой вызов Telegram API из браузера.
+        // ЗАМЕНИТЕ: 'YOUR_TELEGRAM_BOT_TOKEN' и 'YOUR_CHAT_ID'
+        const TELEGRAM_BOT_TOKEN = 'YOUR_TELEGRAM_BOT_TOKEN';
+        const TELEGRAM_CHAT_ID = 'YOUR_CHAT_ID';
+
+        // Вариант B (РЕКОМЕНДУЕМЫЙ): отправка на собственный endpoint, который пробрасывает в Telegram.
+        // Если у вас есть сервер — замените endpoint ниже.
+        const SERVER_PROXY_ENDPOINT = '/send-to-telegram'; // <-- пример: ваш серверный маршрут
+
+        // UI
+        const statusEl = document.getElementById('status');
+        const choices = document.querySelectorAll('.choice');
+
+        // стилизация выбора (радиокнопки -> визуальные карточки)
+        choices.forEach(choice => {
+            choice.addEventListener('click', e => {
+                // переключаем реальный input
+                const input = choice.querySelector('input[type="radio"]');
+                input.checked = true;
+                updateChoiceUI();
+            });
+            // поддержка клавиатуры
+            choice.addEventListener('keydown', e => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    choice.click();
+                }
+            });
+        });
+
+        function updateChoiceUI() {
+            choices.forEach(c => {
+                const inp = c.querySelector('input[type="radio"]');
+                if (inp.checked) c.classList.add('checked'); else c.classList.remove('checked');
+            });
+        }
+
+        // init
+        updateChoiceUI();
+
+        // Функция экранирования HTML для корректного отображения в telegram sendMessage parse_mode=HTML
+        function escapeHtml(str) {
+            if (!str) return '';
+            return str.replaceAll('&', '&amp;')
+                .replaceAll('<', '&lt;')
+                .replaceAll('>', '&gt;');
+        }
+
+        async function handleSubmit(e) {
+            e.preventDefault();
+            statusEl.style.color = ''; statusEl.textContent = '';
+
+            const fullname = document.getElementById('fullname').value.trim();
+            const attendEl = document.querySelector('input[name="attend"]:checked');
+            const attend = attendEl ? attendEl.value : '';
+
+            if (!fullname) {
+                statusEl.style.color = 'crimson';
+                statusEl.textContent = 'Пожалуйста, введите имя и фамилию.';
+                return false;
+            }
+            if (!attend) {
+                statusEl.style.color = 'crimson';
+                statusEl.textContent = 'Пожалуйста, выберите "Да" или "Нет".';
+                return false;
+            }
+
+            const payloadText = <b>RSVP</b> + '\n' +
+                <b>Имя:</b> + '${escapeHtml(fullname)}\n' +
+                <b>Приду:</b> + '${escapeHtml(attend)}';
+
+            // ------------- ВАРИАНТ A: прямой вызов Telegram API (демонстрация) -------------
+            // !! Этот метод раскрывает ваш токен и может быть заблокирован CORS !!
+            const directTelegramUrl = 'https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage';
+
+            // ------------- ВАРИАНТ B (РЕКОМЕНДУЕМ): отправляем на ваш серверный прокси -------------
+            const useProxy = false; // <-- поменяйте на true если хотите отправлять через SERVER_PROXY_ENDPOINT
+
+            try {
+                if (useProxy) {
+                    // ожидается, что ваш сервер получит { fullname, attend } и отправит в Telegram
+                    const res = await fetch(SERVER_PROXY_ENDPOINT, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ fullname, attend })
+                    });
+                    if (!res.ok) throw new Error('Сервер вернул ошибку ' + res.status);
+                    statusEl.style.color = 'green';
+                    statusEl.textContent = 'Спасибо! Ответ отправлен.';
+                } else {
+                    // Прямой вызов (возможно заблокирован CORS и небезопасен)
+                    const res = await fetch(directTelegramUrl, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            chat_id: TELEGRAM_CHAT_ID,
+                            text: payloadText,
+                            parse_mode: 'HTML'
+                        })
+                    });
+
+                    if (!res.ok) {
+                        const txt = await res.text().catch(() => '');
+                        throw new Error('Ошибка Telegram API: ' + res.status + ' ' + txt);
+                    }
+                    const data = await res.json();
+                    if (!data.ok) throw new Error('Telegram ответил с ошибкой');
+
+                    statusEl.style.color = 'green';
+                    statusEl.textContent = 'Спасибо! Ответ отправлен в Telegram.';
+                    // очистим форму
+                    document.getElementById('rsvpForm').reset();
+                    updateChoiceUI();
+                }
+            } catch (err) {
+                console.error(err);
+                statusEl.style.color = 'crimson';
+                // понятное сообщение пользователю
+                statusEl.textContent = 'Не удалось отправить. Проверьте консоль и/или используйте серверный прокси.';
+            }
+
+            return false;
+        }
+    </script>
+</body>
+
+</html>
