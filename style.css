@@ -1,4 +1,4 @@
-    @import url('https://fonts.googleapis.com/css2?family=Great+Vibes&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Great+Vibes&family=Pacifico&display=swap');
 
     body {
         font-family: 'Great Vibes', cursive;
@@ -74,7 +74,7 @@
     .locations {
         padding: 10px 12px;
         text-align: center;
-        font-family: 'Ink Free';
+        font-family: 'Pacifico';
         font-size: 32px;
     }
 
@@ -105,7 +105,7 @@
     form.rsvp {
         display: flex;
         flex-direction: column;
-        font-family: 'Ink Free';
+        font-family: 'Pacifico';
         gap: 14px;
         margin-top: 14px;
     }
@@ -210,9 +210,8 @@
         align-items: center;
         text-align: center;
         color: #ffffff;
-        font-weight: 600;
-        font-size: 16px;
-        font-family: 'Ink Free';
+        font-size: 20px;
+        font-family: 'Pacifico';
     }
 
     .event-column h1 {
@@ -239,14 +238,13 @@
     }
 
     button.submit {
-        font-family: 'Ink Free';
+        font-family: 'Pacifico';
         background: var(--accent);
         color: white;
         padding: 10px 16px;
         border-radius: 10px;
         border: 0;
         cursor: pointer;
-        font-weight: 600;
         box-shadow: 0 8px 20px rgba(184, 92, 122, 0.16);
     }
 
