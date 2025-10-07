@@ -7,6 +7,41 @@
     <title>Приглашение на свадьбу</title>
 </head>
 
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const form = document.getElementById('rsvpForm');
+
+        form.addEventListener('submit', async (e) => {
+            const name = document.getElementById('fullname').value;
+            const attendEl = document.querySelector('input[name="attend"]:checked');
+            const attend = attendEl ? attendEl.value : '';
+
+            e.preventDefault();
+            console.log(name)
+            console.log(attendEl)
+
+            if (!name || !attend) {
+                alert('Пожалуйста, заполните все поля.');
+                return;
+            }
+
+            const res = await fetch('https://valerick.pythonanywhere.com/rsvp', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ name, attend })
+            });
+
+            const data = await res.json();
+            if (data.success) {
+                alert('Спасибо! Ваш ответ отправлен 💌');
+                document.getElementById('rsvp-form').reset();
+            } else {
+                alert('Ошибка: ' + data.error);
+            }
+        });
+    });
+</script>
+
 <body>
     <section class="hero">
         <div class="card" role="region" aria-label="Приглашение на свадьбу">
@@ -46,7 +81,7 @@
                 <p class="loc">Московская область, городской округ Красногорск, деревня Путилково 11, стр. 17</p>
             </div>
 
-            <form class="rsvp" id="rsvpForm" onsubmit="return handleSubmit(event)" autocomplete="off">
+            <form class="rsvp" id="rsvpForm" autocomplete="off">
                 <label class="field">
                     <span class="question">Подтвердите свое присутствие</span>
                 </label>
@@ -58,16 +93,16 @@
 
                 <div>
                     <span class="note">Выберите вариант:</span>
-                    <div class="choices" role="radiogroup" aria-labelledby="rsvpChoice">
-                        <label class="choice" id="choiceYes" tabindex="0">
+                    <div class="choices">
+                        <label class="choice">
+                            <input type="radio" name="attend" value="Да"/>
                             <div class="box"></div>
-                            <input type="radio" name="attend" value="Да" id="attend_yes" />
                             <span>Да, приду</span>
                         </label>
 
-                        <label class="choice" id="choiceNo" tabindex="0">
+                        <label class="choice">
+                            <input type="radio" name="attend" value="Нет"/>
                             <div class="box"></div>
-                            <input type="radio" name="attend" value="Нет" id="attend_no" />
                             <span>Нет, не смогу</span>
                         </label>
                     </div>
@@ -80,133 +115,6 @@
             </form>
         </div>
     </section>
-
-    <script>
-        // --- Настройки: замените на ваши данные ---
-        // Вариант A (НЕБЕЗОПАСНЫЙ, демонстрационный): прямой вызов Telegram API из браузера.
-        // ЗАМЕНИТЕ: 'YOUR_TELEGRAM_BOT_TOKEN' и 'YOUR_CHAT_ID'
-        const TELEGRAM_BOT_TOKEN = 'YOUR_TELEGRAM_BOT_TOKEN';
-        const TELEGRAM_CHAT_ID = 'YOUR_CHAT_ID';
-
-        // Вариант B (РЕКОМЕНДУЕМЫЙ): отправка на собственный endpoint, который пробрасывает в Telegram.
-        // Если у вас есть сервер — замените endpoint ниже.
-        const SERVER_PROXY_ENDPOINT = '/send-to-telegram'; // <-- пример: ваш серверный маршрут
-
-        // UI
-        const statusEl = document.getElementById('status');
-        const choices = document.querySelectorAll('.choice');
-
-        // стилизация выбора (радиокнопки -> визуальные карточки)
-        choices.forEach(choice => {
-            choice.addEventListener('click', e => {
-                // переключаем реальный input
-                const input = choice.querySelector('input[type="radio"]');
-                input.checked = true;
-                updateChoiceUI();
-            });
-            // поддержка клавиатуры
-            choice.addEventListener('keydown', e => {
-                if (e.key === 'Enter' || e.key === ' ') {
-                    e.preventDefault();
-                    choice.click();
-                }
-            });
-        });
-
-        function updateChoiceUI() {
-            choices.forEach(c => {
-                const inp = c.querySelector('input[type="radio"]');
-                if (inp.checked) c.classList.add('checked'); else c.classList.remove('checked');
-            });
-        }
-
-        // init
-        updateChoiceUI();
-
-        // Функция экранирования HTML для корректного отображения в telegram sendMessage parse_mode=HTML
-        function escapeHtml(str) {
-            if (!str) return '';
-            return str.replaceAll('&', '&amp;')
-                .replaceAll('<', '&lt;')
-                .replaceAll('>', '&gt;');
-        }
-
-        async function handleSubmit(e) {
-            e.preventDefault();
-            statusEl.style.color = ''; statusEl.textContent = '';
-
-            const fullname = document.getElementById('fullname').value.trim();
-            const attendEl = document.querySelector('input[name="attend"]:checked');
-            const attend = attendEl ? attendEl.value : '';
-
-            if (!fullname) {
-                statusEl.style.color = 'crimson';
-                statusEl.textContent = 'Пожалуйста, введите имя и фамилию.';
-                return false;
-            }
-            if (!attend) {
-                statusEl.style.color = 'crimson';
-                statusEl.textContent = 'Пожалуйста, выберите "Да" или "Нет".';
-                return false;
-            }
-
-            const payloadText = <b>RSVP</b> + '\n' +
-                <b>Имя:</b> + '${escapeHtml(fullname)}\n' +
-                <b>Приду:</b> + '${escapeHtml(attend)}';
-
-            // ------------- ВАРИАНТ A: прямой вызов Telegram API (демонстрация) -------------
-            // !! Этот метод раскрывает ваш токен и может быть заблокирован CORS !!
-            const directTelegramUrl = 'https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage';
-
-            // ------------- ВАРИАНТ B (РЕКОМЕНДУЕМ): отправляем на ваш серверный прокси -------------
-            const useProxy = false; // <-- поменяйте на true если хотите отправлять через SERVER_PROXY_ENDPOINT
-
-            try {
-                if (useProxy) {
-                    // ожидается, что ваш сервер получит { fullname, attend } и отправит в Telegram
-                    const res = await fetch(SERVER_PROXY_ENDPOINT, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ fullname, attend })
-                    });
-                    if (!res.ok) throw new Error('Сервер вернул ошибку ' + res.status);
-                    statusEl.style.color = 'green';
-                    statusEl.textContent = 'Спасибо! Ответ отправлен.';
-                } else {
-                    // Прямой вызов (возможно заблокирован CORS и небезопасен)
-                    const res = await fetch(directTelegramUrl, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({
-                            chat_id: TELEGRAM_CHAT_ID,
-                            text: payloadText,
-                            parse_mode: 'HTML'
-                        })
-                    });
-
-                    if (!res.ok) {
-                        const txt = await res.text().catch(() => '');
-                        throw new Error('Ошибка Telegram API: ' + res.status + ' ' + txt);
-                    }
-                    const data = await res.json();
-                    if (!data.ok) throw new Error('Telegram ответил с ошибкой');
-
-                    statusEl.style.color = 'green';
-                    statusEl.textContent = 'Спасибо! Ответ отправлен в Telegram.';
-                    // очистим форму
-                    document.getElementById('rsvpForm').reset();
-                    updateChoiceUI();
-                }
-            } catch (err) {
-                console.error(err);
-                statusEl.style.color = 'crimson';
-                // понятное сообщение пользователю
-                statusEl.textContent = 'Не удалось отправить. Проверьте консоль и/или используйте серверный прокси.';
-            }
-
-            return false;
-        }
-    </script>
 </body>
 
 </html>
