@@ -25,7 +25,7 @@
                 return;
             }
 
-            const res = await fetch('http://94.103.12.102:5000/rsvp', {
+            const res = await fetch('http://94.103.12.102:8080/rsvp', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ name, attend })
