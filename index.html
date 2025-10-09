@@ -4,14 +4,24 @@
 <head>
     <meta charset="utf-8" />
     <link rel="stylesheet" href="style.css">
-    <title>Приглашение на свадьбу</title>
+    <title>Арам + Наталья</title>
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="Приглашение на свадьбу Арама и Натальи">
+    <meta property="og:description" content="Приглашение на свадьбу Арама и Натальи">
+    <meta property="og:image" content="https://iimg.su/i/6t0WPc">
+    <meta property="og:url" content="http://94.103.12.102:8087/aramnatalya/">
+    <meta property="og:site_name" content="Арам + Наталья">
 </head>
 
+<script src="https://cdn.jsdelivr.net/npm/emailjs-com@3/dist/email.min.js"></script>
 <script>
+    (function () {
+        emailjs.init("B2jgFFODGH9g04_W-");
+    })();
     document.addEventListener('DOMContentLoaded', () => {
         const form = document.getElementById('rsvpForm');
 
-        form.addEventListener('submit', async (e) => {
+        form.addEventListener('submit', function (e) {
             const name = document.getElementById('fullname').value;
             const attendEl = document.querySelector('input[name="attend"]:checked');
             const attend = attendEl ? attendEl.value : '';
@@ -25,19 +35,12 @@
                 return;
             }
 
-            const res = await fetch('http://94.103.12.102:8080/rsvp', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ name, attend })
-            });
+            emailjs.sendForm("service_xfih21p", "template_v90o2u2", this)
+            .then(() => alert("Письмо отправлено!"), err => alert("Ошибка: " + err));
 
-            const data = await res.json();
-            if (data.success) {
-                alert('Спасибо! Ваш ответ отправлен 💌');
-                document.getElementById('rsvp-form').reset();
-            } else {
-                alert('Ошибка: ' + data.error);
-            }
+            alert('Спасибо! Ваш ответ отправлен 💌');
+            document.getElementById('rsvp-form').reset();
+            
         });
     });
 </script>
@@ -95,13 +98,13 @@
                     <span class="note">Выберите вариант:</span>
                     <div class="choices">
                         <label class="choice">
-                            <input type="radio" name="attend" value="Да"/>
+                            <input type="radio" name="attend" value="Да" />
                             <div class="box"></div>
                             <span>Да, приду</span>
                         </label>
 
                         <label class="choice">
-                            <input type="radio" name="attend" value="Нет"/>
+                            <input type="radio" name="attend" value="Нет" />
                             <div class="box"></div>
                             <span>Нет, не смогу</span>
                         </label>
