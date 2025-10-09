@@ -35,8 +35,7 @@
                 return;
             }
 
-            emailjs.sendForm("service_xfih21p", "template_v90o2u2", this)
-            .then(() => alert("Письмо отправлено!"), err => alert("Ошибка: " + err));
+            emailjs.sendForm("service_xfih21p", "template_v90o2u2", this);
 
             alert('Спасибо! Ваш ответ отправлен 💌');
             document.getElementById('rsvp-form').reset();
